@@ -5,6 +5,30 @@ import numpy as np
 import joblib
 import json
 from tensorflow.keras.models import load_model
+import os
+from pathlib import Path
+import gdown
+import joblib, json, pandas as pd, numpy as np, streamlit as st
+
+MODEL_PATH = Path("motion_model_v2.h5")
+SCALER_PATH = Path("scaler.pkl")
+LABELS_PATH = Path("label_map.json")
+
+def ensure_file(local_path: Path, gdrive_id: str):
+    if not local_path.exists():
+        url = f"https://drive.google.com/uc?id={gdrive_id}"
+        gdown.download(url, str(local_path), quiet=False)
+
+# TODO: replace with your real file IDs
+ensure_file(MODEL_PATH,  "YOUR_MODEL_FILE_ID")
+ensure_file(SCALER_PATH, "YOUR_SCALER_FILE_ID")
+ensure_file(LABELS_PATH, "YOUR_LABELS_FILE_ID")
+
+model  = load_model(str(MODEL_PATH))
+scaler = joblib.load(str(SCALER_PATH))
+with open(LABELS_PATH, "r") as f:
+    label_map = {int(k): v for k, v in json.load(f).items()}
+
 
 # Load model and helper files
 model = load_model("motion_model_v2.h5")
